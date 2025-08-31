@@ -4,7 +4,7 @@ import type { TradeData, ClientSubscription, ExtendedWebSocket, CandleData, BidA
 
 const port: number = 8080;
 
-// Store current candle data for each symbol+timeframe combination
+// like a dict map a string(trade.symbol-timeframe) to candle data
 const currentCandles = new Map<string, CandleData>();
 
 // Get timeframe in milliseconds
