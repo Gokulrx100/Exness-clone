@@ -1,11 +1,12 @@
-import WebSocket = require("ws");
-import Redis = require("ioredis");
-const { Pool } = require("pg");
+import WebSocket from "ws";
+import Redis from "ioredis";
+import {Pool} from "pg";
+import type { BinanceTrade, TradeData } from "./types.js";
 
 const pool = new Pool({
   user: "gokul",
   host: "localhost",
-  database: "tradingdb",
+  database: "tradingDB",
   password: "gokupass",
   port: 5432,
 });
@@ -26,26 +27,6 @@ const redis = new Redis({
   host: "localhost",
   port: 6379,
 });
-
-interface BinanceTrade {
-  t: string;
-  T: number;
-  s: string;
-  p: string;
-  q: string;
-  m: boolean;
-}
-
-interface TradeData {
-  tradeId: string;
-  tradeTime: Date;
-  symbol: string;
-  priceValue: bigint;
-  priceDecimals: number;
-  quantityValue: bigint;
-  quantityDecimals: number;
-  side: string;
-}
 
 let trades: TradeData[] = [];
 const BATCH_SIZE = 50;
@@ -95,6 +76,8 @@ binanceSocket.on("message", async (raw: any): Promise<void> => {
     price: parseFloat(trade.p),
     quantity: parseFloat(trade.q),
     side: trade.m ? "SELL" : "BUY",
+    bid: parseFloat(trade.p) * (1 - 0.005),
+    ask: parseFloat(trade.p) * (1 + 0.005)
   };
   redis.publish("trades", JSON.stringify(redisData));
 
