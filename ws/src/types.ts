@@ -2,13 +2,17 @@ import WebSocket from 'ws';
 
 export interface TradeData {
     tradeId: string;
+    tradeTime: Date;
     symbol: string;
-    price: number;
-    quantity: number;
-    tradeTime: string; 
+    price: bigint;
+    priceDecimals: number;
+    quantity: bigint;
+    quantityDecimals: number;
     side: string;
-    bid: number;
-    ask: number;
+    bid: bigint;
+    bidDecimals: number;
+    ask: bigint;
+    askDecimals: number;
 }
 
 export interface ClientSubscription {
@@ -21,20 +25,32 @@ export interface ExtendedWebSocket extends WebSocket {
     clientId: string;
 }
 
+// Internal storage types (only for candles - they need accumulation)
 export interface CandleData {
     symbol: string;
     timeframe: string;
     timestamp: number;
-    open: number;
-    high: number;
-    low: number;
-    close: number;
-    volume: number;
+    open: bigint;
+    high: bigint;
+    low: bigint;
+    close: bigint;
+    volume: bigint;
+    decimals: number;
 }
 
-export interface BidAskData {
-    symbol: string;
-    bid: number;
-    ask: number;
+// Frontend response formats
+export interface FrontendCandle {
     timestamp: number;
+    open: number;
+    close: number;
+    high: number;
+    low: number;
+    decimals: number;
+}
+
+export interface FrontendPriceUpdate {
+    symbol: string;
+    buyPrice: number;
+    sellPrice: number;
+    decimals: number;
 }

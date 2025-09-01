@@ -36,6 +36,19 @@ function convertToInteger(value: string, decimals: number): bigint {
   return BigInt(Math.round(num * Math.pow(10, decimals)));
 }
 
+// Custom JSON serializer to handle BigInt
+const serializeForRedis = (obj: any): string => {
+  return JSON.stringify(obj, (key, value) => {
+    if (typeof value === 'bigint') {
+      return value.toString();
+    }
+    if (value instanceof Date) {
+      return value.toISOString();
+    }
+    return value;
+  });
+};
+
 redis.on("connect", (): void => console.log("Connected to Redis (publisher)"));
 redis.on("error", (err: Error): void => console.error("Redis Error:", err));
 
@@ -69,21 +82,24 @@ binanceSocket.on("message", async (raw: any): Promise<void> => {
 
   trades.push(t);
   
-  const redisData : redisTradeData = {
+  // Redis data - matching the TradeData interface expected by WS
+  const redisData: redisTradeData = {
     tradeId: trade.t,
     tradeTime: new Date(trade.T),
     symbol: trade.s,
     price: convertToInteger(trade.p, config.priceDecimals),
-    priceDecimals :  config.priceDecimals,
+    priceDecimals: config.priceDecimals,
     quantity: convertToInteger(trade.q, config.quantityDecimals),
-    quantityDecimals : config.quantityDecimals,
+    quantityDecimals: config.quantityDecimals,
     side: trade.m ? "SELL" : "BUY",
-    bid: convertToInteger((parseFloat(trade.p) * (1 - 0.005)).toString(),config.priceDecimals),
-    bidDecimals : config.priceDecimals,
-    ask: convertToInteger((parseFloat(trade.p) * (1 + 0.005)).toString(),config.priceDecimals),
-    askDecimals : config.priceDecimals
+    bid: convertToInteger((parseFloat(trade.p) * (1 - 0.005)).toString(), config.priceDecimals),
+    bidDecimals: config.priceDecimals,
+    ask: convertToInteger((parseFloat(trade.p) * (1 + 0.005)).toString(), config.priceDecimals),
+    askDecimals: config.priceDecimals
   };
-  redis.publish("trades", JSON.stringify(redisData));
+
+  // Use custom serializer for Redis
+  redis.publish("trades", serializeForRedis(redisData));
 
   if (trades.length >= BATCH_SIZE) {
     const batch = [...trades];
@@ -125,4 +141,4 @@ binanceSocket.on("close", (): void => {
   console.log("Binance WebSocket connection closed");
 });
 
-console.log("Application started - fetching trade data...");
+console.log("Fetching trade data...");
