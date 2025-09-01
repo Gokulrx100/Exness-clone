@@ -1,7 +1,7 @@
 import WebSocket from "ws";
 import Redis from "ioredis";
 import {Pool} from "pg";
-import type { BinanceTrade, TradeData } from "./types.js";
+import type { BinanceTrade, TradeData, redisTradeData } from "./types.js";
 
 const pool = new Pool({
   user: "gokul",
@@ -69,15 +69,19 @@ binanceSocket.on("message", async (raw: any): Promise<void> => {
 
   trades.push(t);
   
-  const redisData = {
+  const redisData : redisTradeData = {
     tradeId: trade.t,
     tradeTime: new Date(trade.T),
     symbol: trade.s,
-    price: parseFloat(trade.p),
-    quantity: parseFloat(trade.q),
+    price: convertToInteger(trade.p, config.priceDecimals),
+    priceDecimals :  config.priceDecimals,
+    quantity: convertToInteger(trade.q, config.quantityDecimals),
+    quantityDecimals : config.quantityDecimals,
     side: trade.m ? "SELL" : "BUY",
-    bid: parseFloat(trade.p) * (1 - 0.005),
-    ask: parseFloat(trade.p) * (1 + 0.005)
+    bid: convertToInteger((parseFloat(trade.p) * (1 - 0.005)).toString(),config.priceDecimals),
+    bidDecimals : config.priceDecimals,
+    ask: convertToInteger((parseFloat(trade.p) * (1 + 0.005)).toString(),config.priceDecimals),
+    askDecimals : config.priceDecimals
   };
   redis.publish("trades", JSON.stringify(redisData));
 

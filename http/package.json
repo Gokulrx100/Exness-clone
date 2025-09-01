@@ -2,7 +2,7 @@
   "name": "http",
   "version": "1.0.0",
   "main": "index.js",
-  "type" : "module",
+  "type": "module",
   "scripts": {
     "dev": "tsc -b && node dist/index.js"
   },
@@ -19,6 +19,7 @@
     "express": "^5.1.0",
     "ioredis": "^5.7.0",
     "pg": "^8.16.3",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "uuid": "^11.1.0"
   }
 }

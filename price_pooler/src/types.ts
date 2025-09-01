@@ -17,3 +17,18 @@ export interface TradeData {
   quantityDecimals: number;
   side: string;
 }
+
+export interface redisTradeData {
+  tradeId : string;
+  tradeTime : Date;
+  symbol : string;
+  price : bigint;
+  priceDecimals : number;
+  quantity : bigint;
+  quantityDecimals : number;
+  side : string;
+  bid : bigint;
+  bidDecimals : number;
+  ask : bigint;
+  askDecimals : number;
+}
