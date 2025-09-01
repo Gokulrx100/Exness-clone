@@ -43,12 +43,10 @@ const updateCandle = (trade: TradeData, timeframe: string): CandleData | null =>
     const candleTimestamp = getCandleTimestamp(tradeTime, timeframe);
     const existingCandle = currentCandles.get(key);
 
-    // Convert bigint values for comparison
     const tradePrice = trade.price;
     const tradeQuantity = trade.quantity;
 
     if (!existingCandle || existingCandle.timestamp !== candleTimestamp) {
-        // New candle
         const newCandle: CandleData = {
             symbol: trade.symbol,
             timeframe,

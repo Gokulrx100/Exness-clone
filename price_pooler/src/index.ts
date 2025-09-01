@@ -36,7 +36,6 @@ function convertToInteger(value: string, decimals: number): bigint {
   return BigInt(Math.round(num * Math.pow(10, decimals)));
 }
 
-// Custom JSON serializer to handle BigInt
 const serializeForRedis = (obj: any): string => {
   return JSON.stringify(obj, (key, value) => {
     if (typeof value === 'bigint') {
@@ -82,7 +81,6 @@ binanceSocket.on("message", async (raw: any): Promise<void> => {
 
   trades.push(t);
   
-  // Redis data - matching the TradeData interface expected by WS
   const redisData: redisTradeData = {
     tradeId: trade.t,
     tradeTime: new Date(trade.T),
@@ -98,7 +96,6 @@ binanceSocket.on("message", async (raw: any): Promise<void> => {
     askDecimals: config.priceDecimals
   };
 
-  // Use custom serializer for Redis
   redis.publish("trades", serializeForRedis(redisData));
 
   if (trades.length >= BATCH_SIZE) {

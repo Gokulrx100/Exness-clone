@@ -25,7 +25,6 @@ export interface ExtendedWebSocket extends WebSocket {
     clientId: string;
 }
 
-// Internal storage types (only for candles - they need accumulation)
 export interface CandleData {
     symbol: string;
     timeframe: string;
@@ -38,7 +37,6 @@ export interface CandleData {
     decimals: number;
 }
 
-// Frontend response formats
 export interface FrontendCandle {
     timestamp: number;
     open: number;
