@@ -1,4 +1,3 @@
-// routes/tradeRoutes.ts
 import { Router } from "express";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -61,7 +60,7 @@ const closeTrade = async (trade: Trade, closePrice: bigint, reason: string) => {
   });
 };
 
-tradeRoutes.post("/trade", authenticateToken, async (req: any, res) => {
+tradeRoutes.post("/trade/create", authenticateToken, async (req: any, res) => {
   try {
     const { asset, type, margin, leverage, stopLoss, takeProfit, slippageBps } =
       req.body;
@@ -143,7 +142,6 @@ tradeRoutes.post("/trade", authenticateToken, async (req: any, res) => {
     newTrade.liquidationPrice = calculateLiquidationPrice(newTrade);
     trades.push(newTrade);
 
-    // Queue email notification
     await emailQueue.add("trade-opened", {
       userId: userId,
       userEmail: user.email,

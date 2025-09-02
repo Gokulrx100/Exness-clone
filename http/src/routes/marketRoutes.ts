@@ -57,7 +57,7 @@ marketRoutes.get("/config", (req, res) => {
 marketRoutes.get("/candles/:symbol/:timeframe", async (req, res) => {
   try {
     const { symbol, timeframe } = req.params;
-    const { limit = 100, from, to } = req.query;
+    const { limit = 100 } = req.query;
     
     const assetConfig = ASSET_CONFIG[symbol as keyof typeof ASSET_CONFIG];
     if (!assetConfig) {
@@ -72,45 +72,29 @@ marketRoutes.get("/candles/:symbol/:timeframe", async (req, res) => {
     const tableName = `trades_${timeframe}`;
     const binanceSymbol = assetConfig.binanceSymbol;
     
-    let query = `
+    const query = `
       SELECT 
-        bucket,
-        open_value,
-        high_value,
-        low_value,
-        close_value,
+        timestamp,
+        open_price_value,
+        high_price_value,
+        low_price_value,
+        close_price_value,
         volume_value,
         price_decimals
       FROM ${tableName} 
       WHERE symbol = $1
+      ORDER BY timestamp DESC 
+      LIMIT $2
     `;
     
-    const queryParams: any[] = [binanceSymbol];
-    let paramIndex = 2;
-    
-    if (from) {
-      query += ` AND bucket >= ${paramIndex}`;
-      queryParams.push(new Date(from as string));
-      paramIndex++;
-    }
-    
-    if (to) {
-      query += ` AND bucket <= ${paramIndex}`;
-      queryParams.push(new Date(to as string));
-      paramIndex++;
-    }
-    
-    query += ` ORDER BY bucket DESC LIMIT ${paramIndex}`;
-    queryParams.push(parseInt(limit as string) || 100);
-    
-    const result = await pool.query(query, queryParams);
+    const result = await pool.query(query, [binanceSymbol, parseInt(limit as string) || 100]);
     
     const candles = result.rows.map(row => ({
-      timestamp: new Date(row.bucket).getTime(),
-      openValue: row.open_value,
-      highValue: row.high_value,
-      lowValue: row.low_value,
-      closeValue: row.close_value,
+      timestamp: new Date(row.timestamp).getTime(),
+      openValue: row.open_price_value,
+      highValue: row.high_price_value,
+      lowValue: row.low_price_value,
+      closeValue: row.close_price_value,
       volumeValue: row.volume_value,
       decimals: row.price_decimals
     }));

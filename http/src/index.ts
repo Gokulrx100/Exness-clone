@@ -8,7 +8,6 @@ import { authRoutes } from "./routes/authRoutes.js";
 import { tradeRoutes } from "./routes/tradeRoutes.js";
 import { userRoutes } from "./routes/userRoutes.js";
 import { marketRoutes } from "./routes/marketRoutes.js";
-import { transporter } from "./services/emailServices.js";
 
 dotenv.config();
 
@@ -19,7 +18,7 @@ declare module "express-serve-static-core" {
 }
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT;
 
 app.use(express.json());
 app.use(cors());
