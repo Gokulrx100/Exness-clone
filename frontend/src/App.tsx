@@ -1,8 +1,9 @@
-import React from 'react'
-
+import SymbolList from './components/OrderList'
 const App = () => {
   return (
-    <div>App</div>
+    <div>
+      <SymbolList/>
+    </div>
   )
 }
 
