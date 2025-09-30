@@ -94,7 +94,7 @@ tradeRoutes.post("/trade/create", authenticateToken, async (req: any, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const marginBigInt = BigInt(Math.floor(margin * 100));
+    const marginBigInt = BigInt(Math.floor(margin * USD_DECIMAL));
     if (marginBigInt <= 0 || user.balance < marginBigInt) {
       return res.status(411).json({ message: "Insufficient margin" });
     }
