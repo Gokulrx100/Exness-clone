@@ -1,14 +1,17 @@
 import WebSocket from "ws";
 import Redis from "ioredis";
 import {Pool} from "pg";
+import dotenv from "dotenv";
 import type { BinanceTrade, TradeData, redisTradeData } from "./types.js";
 
+dotenv.config();
+
 const pool = new Pool({
-  user: "gokul",
-  host: "localhost",
-  database: "tradingDB",
-  password: "gokupass",
-  port: 5432,
+  user: process.env.DB_USER || "gokul",
+  host: process.env.DB_HOST || "localhost",
+  database: process.env.DB_NAME || "tradingDB",
+  password: process.env.DB_PASSWORD || "gokupass",
+  port: parseInt(process.env.DB_PORT || "5432"),
 });
 
 const SYMBOLS: string[] = ["btcusdt", "ethusdt", "solusdt", "bnbusdt"];
@@ -24,8 +27,8 @@ const SYMBOL_CONFIG = {
 
 //@ts-ignore
 const redis = new Redis({
-  host: "localhost",
-  port: 6379,
+  host: process.env.REDIS_HOST || "localhost",
+  port: parseInt(process.env.REDIS_PORT || "6379"),
 });
 
 let trades: TradeData[] = [];

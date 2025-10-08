@@ -1,5 +1,6 @@
 import WebSocket = require('ws');
 import Redis from 'ioredis';
+import dotenv from 'dotenv';
 import type { 
     TradeData, 
     ClientSubscription, 
@@ -9,7 +10,9 @@ import type {
     FrontendPriceUpdate
 } from './types.js';
 
-const port: number = 8080;
+dotenv.config();
+
+const port: number = parseInt(process.env.WS_PORT || "8080");
 
 // stores candle data like a dict with key "tradesymbol-timeframe" 
 const currentCandles = new Map<string, CandleData>();
@@ -97,8 +100,8 @@ const startWsServer = (port: number): void => {
     
     //@ts-ignore
     const sub = new Redis({
-        host: 'localhost',
-        port: 6379
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT || '6379')
     });
 
     sub.on("connect", (): void => console.log("Connected to Redis (subscriber)"));
